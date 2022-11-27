@@ -1,14 +1,13 @@
 package com.example.secondassignmentgame
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.example.secondassignmentgame.ICharacterService
 import kotlin.math.min
 
-class GameStage(context : Context?, attrs : AttributeSet?) : View(context,attrs) {
+class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) {
 
     // We have to use 90% of the width to render the stage.
     private  final  val  scaleFactor = 0.90f
@@ -19,13 +18,16 @@ class GameStage(context : Context?, attrs : AttributeSet?) : View(context,attrs)
 
     private final val paint = Paint()
 
+    var characterService : ICharacterService ? = null
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         setResponsiveStage(canvas)
         drawBoard(canvas)
         drawTrap(canvas)
+        drawCharacters(canvas)
     }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val minimumWidthScreen = min(widthMeasureSpec,heightMeasureSpec)
@@ -57,35 +59,60 @@ class GameStage(context : Context?, attrs : AttributeSet?) : View(context,attrs)
     }
 
     private fun drawTrap(canvas: Canvas?) {
-        val paint2 = Paint()
-        paint2.color = Color.BLACK
+        val paint = Paint()
+        paint.color = Color.BLACK
         canvas?.drawRect(
             cellStartXPos +  3*  cellWidth,
             cellStartYPos + (1+2)*  cellWidth,
             cellStartXPos +  2*cellWidth,
             cellStartYPos +  2*cellWidth,
-            paint2
+            paint
         )
         canvas?.drawRect(
             cellStartXPos +  6*  cellWidth,
             cellStartYPos + (1+2)*  cellWidth,
             cellStartXPos +  (2+3)*cellWidth,
             cellStartYPos +  2*cellWidth,
-            paint2
+            paint
         )
         canvas?.drawRect(
             cellStartXPos +  3*  cellWidth,
             cellStartYPos + 5*  cellWidth,
             cellStartXPos +  2*cellWidth,
             cellStartYPos +  6*cellWidth,
-            paint2
+            paint
         )
         canvas?.drawRect(
             cellStartXPos +  6*  cellWidth,
             cellStartYPos + 5*  cellWidth,
             cellStartXPos +  (2+3)*cellWidth,
             cellStartYPos +  6*cellWidth,
-            paint2
+            paint
+        )
+    }
+
+    private fun drawCharacters(canvas: Canvas?){
+        for(rowPos in 0..7){
+            for (colPos in 0..7){
+                val char = characterService?.position(rowPos,colPos)
+                if(char != null ){
+                    val bmp = BitmapFactory.decodeResource(resources,char.drawable)
+                    drawCharacterAtPos(canvas,bmp,rowPos,colPos)
+                }
+            }
+        }
+    }
+    private fun drawCharacterAtPos(canvas: Canvas?, image: Bitmap, row:Int, col:Int){
+        canvas?.drawBitmap(
+            image,
+            null,
+            RectF(
+                cellStartXPos + col * cellWidth,
+                cellStartYPos + row * cellWidth,
+                cellStartXPos + (col + 1) * cellWidth,
+                cellStartYPos + (row + 1) * cellWidth
+            ),
+            paint
         )
     }
 }
