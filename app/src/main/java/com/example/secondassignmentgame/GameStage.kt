@@ -3,6 +3,7 @@ package com.example.secondassignmentgame
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import com.example.secondassignmentgame.ICharacterService
 import kotlin.math.min
@@ -18,6 +19,11 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
 
     private final val paint = Paint()
 
+    private var isMoving : Boolean = false
+    private var fromColPos :Int =-1
+    private var fromRowPos :Int =-1
+
+
     var characterService : ICharacterService ? = null
 
     override fun onDraw(canvas: Canvas?) {
@@ -26,6 +32,26 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
         drawBoard(canvas)
         drawTrap(canvas)
         drawCharacters(canvas)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event ?: return false
+        when(event.action){
+            MotionEvent.ACTION_UP ->{
+                if(!isMoving){
+                    fromColPos = ((event.x - cellStartXPos) / cellWidth).toInt()
+                    fromRowPos=  ((event.y - cellStartYPos) / cellWidth).toInt()
+                    isMoving =true
+                }else{
+                    var toColPos = ((event.x - cellStartXPos) / cellWidth).toInt()
+                    var toRowPos= ((event.y - cellStartYPos) / cellWidth).toInt()
+                    if(fromRowPos == toRowPos && fromColPos == fromRowPos) return false
+                    characterService?.moveCharacter(fromRowPos,fromColPos,toRowPos,toColPos)
+                    isMoving =false
+                }
+            }
+        }
+        return true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -103,6 +129,7 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
         }
     }
     private fun drawCharacterAtPos(canvas: Canvas?, image: Bitmap, row:Int, col:Int){
+
         canvas?.drawBitmap(
             image,
             null,

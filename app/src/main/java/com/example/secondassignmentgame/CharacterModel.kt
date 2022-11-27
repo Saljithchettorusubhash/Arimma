@@ -1,10 +1,14 @@
 package com.example.secondassignmentgame
 
 import com.example.secondassignmentgame.*
+import android.util.Log
 
 
 object CharacterModel {
     private val characters = mutableSetOf<ArimaCharacter>()
+    //Following two variables are keeping track of movement history
+    var currentTurn : ArimaPlayer = ArimaPlayer.GOLD
+    var currentSteps : Int = 0
 
     init{
         resetCharacters()
@@ -18,6 +22,15 @@ object CharacterModel {
             return null
         }
     }
+    fun getTurn() : String {
+        return "${currentTurn.toString()} [${4-currentSteps}]"
+    }
+
+
+    fun setTurn(turn:ArimaPlayer)  {
+        currentTurn = turn
+    }
+
 
     private fun resetCharacters() {
         characters.removeAll(characters)
@@ -50,5 +63,38 @@ object CharacterModel {
         characters.add(ArimaCharacter(4,1,ArimaPlayer.SILVER,PlayerStrength.ELEPHANT, R.drawable.selephant))
         characters.add(ArimaCharacter(4,6,ArimaPlayer.GOLD,PlayerStrength.ELEPHANT, R.drawable.elephant))
 
+    }
+
+    fun moveCharacter(sourceRowPos: Int,sourceColPos: Int, destinationRowPos: Int, destinationColPos:Int){
+        var movingCharacter = position(sourceRowPos,sourceColPos) ?: return
+        if(currentTurn==ArimaPlayer.GOLD && currentSteps<=4){
+            if(movingCharacter.player==ArimaPlayer.SILVER) return;
+            Log.d("Moving: $currentSteps",movingCharacter.player.toString())
+            characters.remove(movingCharacter)
+            characters.add(ArimaCharacter(destinationColPos,destinationRowPos,movingCharacter.player
+                ,movingCharacter.strength,movingCharacter.drawable))
+
+            currentSteps++;
+            if(currentSteps>3) {
+                finishMovement()
+            }
+        }else{
+            if(movingCharacter.player==ArimaPlayer.GOLD) return;
+            Log.d("Moving: $currentSteps",movingCharacter.player.toString())
+            characters.remove(movingCharacter)
+            characters.add(ArimaCharacter(destinationColPos,destinationRowPos,movingCharacter.player
+                ,movingCharacter.strength,movingCharacter.drawable))
+
+            currentSteps++;
+            if(currentSteps>3) {
+                finishMovement()
+            };
+        }
+    }
+    fun finishMovement(){
+        currentSteps = 0;
+        if (currentTurn == ArimaPlayer.GOLD) setTurn(ArimaPlayer.SILVER) else setTurn(
+            ArimaPlayer.GOLD
+        )
     }
 }
