@@ -37,18 +37,25 @@ class MainActivity : Activity() , ICharacterService {
     }
 
     override fun moveCharacter(fromRowPos: Int, fromColPos: Int, toRowPos: Int, toColPos: Int) {
+        // Clear if any previous messages displayed in the UI
+        CharacterModel.setMessage("")
         CharacterModel.moveCharacter(fromRowPos,fromColPos,toRowPos,toColPos)
         getTurn()
+        getMessage()
         findViewById<GameStage>(R.id.stage).invalidate()
     }
 
     override fun finishMovement() {
+        // Clear if any previous messages displayed in the UI
+        CharacterModel.setMessage("")
         CharacterModel.finishMovement()
+        getMessage()
         getTurn()
     }
     // For updating UI elements
     override fun getTurn(): String? {
         var curTurn = CharacterModel.getTurn()
+        findViewById<TextView>(R.id.turn).text = "Turn: $curTurn"
         // UI highlights on each turn
         if(curTurn.contains("GOLD")) {
             findViewById<Button>(R.id.btn_silver_finish).isEnabled = false
@@ -61,6 +68,11 @@ class MainActivity : Activity() , ICharacterService {
             findViewById<Button>(R.id.btn_silver_finish).setBackgroundColor(Color.parseColor("#2196f3"))
             findViewById<Button>(R.id.btn_finish).setBackgroundColor(Color.LTGRAY)
         }
+        return null;
+    }
+
+    override fun getMessage(): String? {
+        findViewById<TextView>(R.id.message).text = CharacterModel.getMessage()
         return null;
     }
 }
