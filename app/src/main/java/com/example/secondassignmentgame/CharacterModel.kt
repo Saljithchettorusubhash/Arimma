@@ -4,6 +4,7 @@ import com.example.secondassignmentgame.*
 import android.util.Log
 
 
+// not a class because its singleton
 object CharacterModel {
     private val characters = mutableSetOf<ArimaCharacter>()
     //Following two variables are keeping track of movement history
@@ -26,13 +27,11 @@ object CharacterModel {
         return "${currentTurn.toString()} [${4-currentSteps}]"
     }
 
-
     fun setTurn(turn:ArimaPlayer)  {
         currentTurn = turn
     }
 
-
-    private fun resetCharacters() {
+    fun resetCharacters() {
         characters.removeAll(characters)
         //setting rabbits initial position
         for(i in 0..7){ // rows
@@ -77,19 +76,36 @@ object CharacterModel {
             currentSteps++;
             if(currentSteps>3) {
                 finishMovement()
-            }
+            };
         }else{
             if(movingCharacter.player==ArimaPlayer.GOLD) return;
             Log.d("Moving: $currentSteps",movingCharacter.player.toString())
             characters.remove(movingCharacter)
             characters.add(ArimaCharacter(destinationColPos,destinationRowPos,movingCharacter.player
                 ,movingCharacter.strength,movingCharacter.drawable))
-
             currentSteps++;
             if(currentSteps>3) {
                 finishMovement()
             };
         }
+    }
+
+    fun selectCharacter(fromRowPos:Int,fromColPos: Int){
+        var movingCharacter = position(fromRowPos,fromColPos) ?: null
+        if(movingCharacter!=null) {
+            characters.remove(movingCharacter)
+            characters.add(
+                ArimaCharacter(
+                    fromColPos,
+                    fromRowPos,
+                    movingCharacter.player,
+                    movingCharacter.strength,
+                    movingCharacter.drawable,
+                    true
+                )
+            )
+        }
+
     }
     fun finishMovement(){
         currentSteps = 0;

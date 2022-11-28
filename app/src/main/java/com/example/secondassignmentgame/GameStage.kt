@@ -23,7 +23,6 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
     private var fromColPos :Int =-1
     private var fromRowPos :Int =-1
 
-
     var characterService : ICharacterService ? = null
 
     override fun onDraw(canvas: Canvas?) {
@@ -41,6 +40,7 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
                 if(!isMoving){
                     fromColPos = ((event.x - cellStartXPos) / cellWidth).toInt()
                     fromRowPos=  ((event.y - cellStartYPos) / cellWidth).toInt()
+                    characterService?.selectCharacter(fromRowPos,fromColPos)
                     isMoving =true
                 }else{
                     var toColPos = ((event.x - cellStartXPos) / cellWidth).toInt()
@@ -53,7 +53,6 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
         }
         return true
     }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val minimumWidthScreen = min(widthMeasureSpec,heightMeasureSpec)
@@ -123,23 +122,37 @@ class GameStage(context : Context?,attrs : AttributeSet?) : View(context,attrs) 
                 val char = characterService?.position(rowPos,colPos)
                 if(char != null ){
                     val bmp = BitmapFactory.decodeResource(resources,char.drawable)
-                    drawCharacterAtPos(canvas,bmp,rowPos,colPos)
+                    drawCharacterAtPos(canvas,bmp,rowPos,colPos, char.selected)
                 }
             }
         }
     }
-    private fun drawCharacterAtPos(canvas: Canvas?, image: Bitmap, row:Int, col:Int){
-
-        canvas?.drawBitmap(
-            image,
-            null,
-            RectF(
-                cellStartXPos + col * cellWidth,
-                cellStartYPos + row * cellWidth,
-                cellStartXPos + (col + 1) * cellWidth,
-                cellStartYPos + (row + 1) * cellWidth
-            ),
-            paint
-        )
+    private fun drawCharacterAtPos(canvas: Canvas?, image: Bitmap, row:Int, col:Int, selected:Boolean){
+        if(selected){
+            var paintForBorder = Paint()
+            paintForBorder.style = Paint.Style.STROKE
+            paintForBorder.strokeWidth = 5.0f
+            paintForBorder.color = Color.BLUE
+            canvas?.drawRect(
+                cellStartXPos + fromColPos * cellWidth,
+                cellStartYPos +  fromRowPos * cellWidth,
+                cellStartXPos + (fromColPos + 1) * cellWidth,
+                cellStartYPos + ( fromRowPos + 1) * cellWidth,
+                paintForBorder
+            )
+            canvas?.drawBitmap(image,null,RectF(cellStartXPos+col*cellWidth,cellStartYPos+row*cellWidth,cellStartXPos+(col+1)*cellWidth,cellStartYPos+(row+1)*cellWidth),paint)
+        }else {
+            canvas?.drawBitmap(
+                image,
+                null,
+                RectF(
+                    cellStartXPos + col * cellWidth,
+                    cellStartYPos + row * cellWidth,
+                    cellStartXPos + (col + 1) * cellWidth,
+                    cellStartYPos + (row + 1) * cellWidth
+                ),
+                paint
+            )
+        }
     }
 }
