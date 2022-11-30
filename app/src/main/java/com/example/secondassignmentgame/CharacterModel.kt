@@ -6,7 +6,6 @@ import java.lang.Math.abs
 
 
 
-// not a class because its singleton
 object CharacterModel {
     private val characters = mutableSetOf<ArimaCharacter>()
 

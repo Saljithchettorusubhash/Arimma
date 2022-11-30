@@ -18,7 +18,15 @@ class MainActivity : Activity() , ICharacterService {
         // Connect to consume the service implementation
         // to use its service in the view
         findViewById<GameStage>(R.id.stage).characterService = this
-
+        findViewById<Button>(R.id.btn_reset).setOnClickListener(View.OnClickListener {
+            CharacterModel.resetCharacters()
+            finishMovement()
+            CharacterModel.setTurn(ArimaPlayer.GOLD)
+            getMessage()
+            getTurn()
+            findViewById<Button>(R.id.btn_silver_finish).isEnabled = false
+            findViewById<GameStage>(R.id.stage).invalidate()
+        })
         findViewById<Button>(R.id.btn_finish).setOnClickListener(View.OnClickListener {
             finishMovement()
         })
