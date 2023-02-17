@@ -2,6 +2,7 @@ package com.example.secondassignmentgame
 
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.Point
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.View
@@ -44,13 +45,16 @@ class MainActivity : Activity() , ICharacterService {
         findViewById<GameStage>(R.id.stage).invalidate()
     }
 
-    override fun moveCharacter(fromRowPos: Int, fromColPos: Int, toRowPos: Int, toColPos: Int) {
+    override fun moveCharacter(fromRowPos: Int, fromColPos: Int, toRowPos: Int, toColPos: Int): Boolean {
         // Clear if any previous messages displayed in the UI
         CharacterModel.setMessage("")
-        CharacterModel.moveCharacter(fromRowPos,fromColPos,toRowPos,toColPos)
-        getTurn()
-        getMessage()
+        var isSuccess = CharacterModel.moveCharacter(fromRowPos,fromColPos,toRowPos,toColPos)
+        if(isSuccess) {
+            getTurn()
+            getMessage()
+        }
         findViewById<GameStage>(R.id.stage).invalidate()
+        return  isSuccess;
     }
 
     override fun finishMovement() {
@@ -82,6 +86,32 @@ class MainActivity : Activity() , ICharacterService {
     override fun getMessage(): String? {
         findViewById<TextView>(R.id.message).text = CharacterModel.getMessage()
         return null;
+    }
+
+    override fun hightlightPossibleMoves(fromRowPos: Int, fromColPos: Int): ArrayList<Point>? {
+        return CharacterModel.hightlightPossibleMoves(fromRowPos,fromColPos)
+    }
+
+    override fun canMove(rowPos: Int, colPos: Int): Boolean {
+        return CharacterModel.canMove(rowPos,colPos)
+    }
+    override fun freezeCharacter(rowPos: Int,colPos: Int) :Boolean {
+        return CharacterModel.freezeCharacter(rowPos,colPos)
+    }
+    override fun isFreezed(rowPos: Int,colPos: Int) : Boolean {
+        return CharacterModel.isFreezed(rowPos,colPos)
+    }
+    override fun setAsFrozen(rowPos: Int,colPos: Int)  {
+        return CharacterModel.setAsFrozen(rowPos,colPos)
+    }
+    override fun pushCharactor(rowPos: Int,colPos: Int,destinationRowPos: Int,destinationColPos: Int)  :Boolean {
+        return CharacterModel.pushCharactor(rowPos,colPos, destinationRowPos,destinationColPos)
+    }
+    override fun isLargerCharacter(sourceRowPos: Int,sourceColPos: Int,destinationRowPos: Int,destinationColPos: Int) :Boolean   {
+        return CharacterModel.isLargerCharacter(sourceRowPos,sourceColPos,destinationRowPos,destinationColPos)
+    }
+    override fun hasAdjacentFriend(rowPos: Int, colPos: Int):Boolean  {
+        return CharacterModel.hasAdjacentFriend(rowPos,colPos)
     }
 }
 
